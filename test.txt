@@ -1,0 +1,63 @@
+Dưới đây là một ví dụ về cách sử dụng phương thức assertIt() để kiểm tra kết quả trả về của một API:
+
+clojure
+Copy
+@Test
+public void testGetAlbums() {
+    given().
+        baseUri("https://jsonplaceholder.typicode.com").
+    when().
+        get("/albums").
+    then().
+        assertThat().
+        statusCode(200).
+        contentType(ContentType.JSON).
+        body("size()", equalTo(100)).
+        body("[0].userId", equalTo(1)).
+        body("[0].id", notNullValue()).
+        body("[0].title", hasLength(20)).
+        body("[0]", hasKey("id")).
+        body("[0]", hasKey("title")).
+        body("[0]", hasKey("userId")).
+        body("[*].id", not(empty())).
+        body("[*].title", not(empty())).
+        body("[*].userId", notNullValue()).
+        body("[*].id", hasItems(1, 2, 3, 4, 5)).
+        body("[*].id", hasSize(100)).
+        extract().response().
+        then().
+        extract().as(API.class).
+        assertIt("size", 100, ValidatorOperation.EQUALS).
+        assertIt("[0].userId", 1, ValidatorOperation.EQUALS).
+        assertIt("[0].id", null, ValidatorOperation.NOT_NULL).
+        assertIt("[0].title", null, ValidatorOperation.HAS_LENGTH).
+        assertIt("[0]", "id", ValidatorOperation.KEY_PRESENTS).
+        assertIt("[0]", "title", ValidatorOperation.KEY_PRESENTS).
+        assertIt("[0]", "userId", ValidatorOperation.KEY_PRESENTS).
+        assertIt("[*].id", null, ValidatorOperation.NOT_EMPTY).
+        assertIt("[*].title", null, ValidatorOperation.NOT_EMPTY).
+        assertIt("[*].userId", null, ValidatorOperation.NOT_NULL).
+        assertIt("[*].id", Arrays.asList(1, 2, 3, 4, 5), ValidatorOperation.HAS_ALL).
+        assertIt("[*].id", 100, ValidatorOperation.SIZE);
+}
+Trong ví dụ này, chúng ta sử dụng thư viện Rest Assured để gửi yêu cầu HTTP GET đến đường dẫn "/albums" của một API và kiểm tra kết quả trả về.
+
+Sau khi nhận được kết quả, chúng ta sử dụng phương thức assertThat() của Rest Assured để kiểm tra các điều kiện:
+
+StatusCode(200): Kiểm tra mã trạng thái của HTTP Response có phải là 200 hay không.
+ContentType(ContentType.JSON): Kiểm tra kiểu nội dung của phản hồi có phải là JSON hay không.
+body("size()", equalTo(100)): Kiểm tra độ dài của danh sách album có phải là 100 hay không.
+body("[0].userId", equalTo(1)): Kiểm tra userId của album đầu tiên có phải là 1 hay không.
+body("[0].id", notNullValue()): Kiểm tra id của album đầu tiên có phải là không null hay không.
+body("[0].title", hasLength(20)): Kiểm tra độ dài của title của album đầu tiên có phải là 20 hay không.
+body("[0]", hasKey("id")): Kiểm tra album đầu tiên có chứa thuộc tính "id" hay không.
+body("[0]", hasKey("title")): Kiểm tra album đầu tiên có chứa thuộc tính "title" hay không.
+body("[0]", hasKey("userId")): Kiểm tra album đầu tiên có chứa thuộc tính "userId" hay không.
+body("[*].id", not(empty())): Kiểm tra danh sách album có chứa ít nhất một thuộc tính "id".
+body("[*].title", not(empty())): Kiểm tra danh sách album có chứa ít nhất một thuộc tính "title".
+body("[*].userId", notNullValue()): Kiểm tra danh sách album có chứa ít nhất một thuộc tính "userId" không bằng null.
+body("[*].id", hasItems(1, 2, 3, 4, 5)): Kiểm tra danh sách album có chứa các giá trị id là 1, 2, 3, 4, 5 hay không.
+body("[*].id", hasSize(100)): Kiểm tra danh sách album có đúng 100 phần tử hay không.
+Sau đó, chúng ta sử dụng phương thức extract() để lấy kết quả trả về và chuyển đổi sang đối tượng của lớp API. Cuối cùng, chúng ta sử dụng phương thức assertIt() để kiểm tra các thuộc tính trên đối tượng API và đảm bảo rằng chúng đáp ứng các yêu cầu kiểm tra tương ứng.
+
+Lưu ý rằng đoạn mã trên chỉ là một ví dụ và phụ thuộc vào cấu trúc của API cụ thể và những yêu cầu kiểm tra của bạn, phương thức assertIt() có thể cần được sửa đổi để phù hợp.
